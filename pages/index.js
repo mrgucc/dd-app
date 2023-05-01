@@ -1,4 +1,5 @@
 // import { Inter } from 'next/font/google';
+import apiClient from '@/lib/apiFunctions/apiClient';
 import { getAllClasses } from '@/lib/apiFunctions/classes';
 import Head from 'next/head';
 
@@ -11,18 +12,34 @@ const TestContainer = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  gap: 10px;
 `;
 
 const ClassRow = styled.div`
-  width: 100%;
-  height: 20px;
+  width: 200px;
+  height: 40px;
+  border: 1px solid #dadada;
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 150ms ease-in-out;
+  cursor: pointer;
+  :hover {
+    background-color: #fafafa;
+    box-shadow: 0px 0px 10px #dadada;
+  }
 `;
 
 export default function Home({ classes }) {
   classes && console.log(classes);
+
+  async function handleClick(cls) {
+    await apiClient({
+      url: `classes/${cls}`,
+    }).then((res) => {
+      alert(`This is the ${res.data.index} class. Proficiency choices: ${res.data.proficiency_choices[0].desc}  `);
+    });
+  }
   return (
     <>
       <Head>
@@ -33,7 +50,12 @@ export default function Home({ classes }) {
       </Head>
       <main className={``}>
         <TestContainer>
-          {classes && classes.results.map((cls, i) => <ClassRow key={i}>{cls.name}</ClassRow>)}
+          {classes &&
+            classes.results.map((cls, i) => (
+              <ClassRow onClick={() => handleClick(cls.index)} key={i}>
+                {cls.name}
+              </ClassRow>
+            ))}
         </TestContainer>
       </main>
     </>
